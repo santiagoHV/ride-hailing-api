@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+  ride-hailing-db-development:
+    image: postgres:alpine3.19
+    environment:
+      - POSTGRES_DB=ride-hailing-db-dev
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres_data/dev:/var/lib/postgresql/data
+    networks:
+      - ride-hailing-net
+
+  ride-hailing-db-testing:
+    image: postgres:alpine3.19
+    environment:
+      - POSTGRES_DB=ride-hailing-test
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 5433:5432
+    volumes:
+      - ./postgres_data/test:/var/lib/postgresql/data
+    networks:
+      - ride-hailing-net
+
+networks:
+  ride-hailing-net:
+    name: ride-hailing-net
+
+volumes:
+  postgres_data:
+    external: true
