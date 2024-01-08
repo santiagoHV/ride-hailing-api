@@ -3,6 +3,11 @@ import { User } from "../users/user.entity";
 import { PaymentSource } from "../payment-sources/entities/paymentSource.entity";
 import { Payment } from "../payment-sources/entities/payment.entity";
 
+export enum RideStatus {
+    ONROUTE = 'ONROUTE',
+    FINISHED = 'FINISHED'
+}
+
 @Entity()
 export class Ride {
     @PrimaryGeneratedColumn()
@@ -14,17 +19,20 @@ export class Ride {
     @Column({ type: 'double precision' })
     startLng: number
 
-    @Column({ type: 'double precision' })
+    @Column({ type: 'double precision', nullable: true })
     endLat: number
 
-    @Column({ type: 'double precision' })
+    @Column({ type: 'double precision', nullable: true })
     endLng: number
 
     @Column({ type: 'timestamp'})
     startTime: Date
 
-    @Column({ type: 'timestamp'})
+    @Column({ type: 'timestamp', nullable: true})
     endTime: Date
+
+    @Column({ type: 'enum', enum: RideStatus })
+    status: RideStatus
 
     @ManyToOne(() => User, user => user.drivenRides)
     driver: User

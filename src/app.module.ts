@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import ormconfig from './ormconfig';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
+import { RidesModule } from './modules/rides/rides.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { UsersModule } from './modules/users/users.module';
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
     UsersModule,
+    RidesModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

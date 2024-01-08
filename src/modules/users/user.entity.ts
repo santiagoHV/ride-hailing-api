@@ -2,7 +2,10 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Ride } from "../rides/ride.entity";
 import { PaymentSource } from "../payment-sources/entities/paymentSource.entity";
 
-export const ROLES = ['driver', 'rider', 'admin']
+export enum UserRoles {
+    RIDER = 'rider',
+    DRIVER = 'driver'
+}
 
 @Entity()
 export class User {
@@ -20,6 +23,9 @@ export class User {
 
     @Column()
     password: string
+
+    @Column({type: 'enum', enum: UserRoles, default: UserRoles.RIDER})
+    role: UserRoles
 
     @OneToMany(() => Ride, ride => ride.driver)
     drivenRides: Ride[]

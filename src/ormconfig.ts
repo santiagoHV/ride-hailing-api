@@ -18,7 +18,7 @@ const config: DataSourceOptions = {
     synchronize: false,
     migrationsRun: true,
     logging: true,
-    migrations: [__dirname + '/../src/migrations/**/*{.ts,.js}'],
+    migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
 };
 console.log(__dirname + '/migrations/**/*{.ts,.js}');
 
