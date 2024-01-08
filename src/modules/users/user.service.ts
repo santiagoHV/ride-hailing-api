@@ -17,6 +17,12 @@ export class UserService{
         });
     }
 
+    async findById(id: number){
+        return await this.userRepository.findOne({
+            where: { id }
+        });
+    }
+
     async findActiveDrivers(){
         //TODO: create logic to find active drivers
         const drivers = await this.userRepository.find({
