@@ -5,6 +5,8 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorator/auth.decorator";
 import { UserRoles } from "../users/user.entity";
+import { PaymentSource } from "../payment-sources/entities/paymentSource.entity";
+import { PayRideDto } from "./dtos/payRideDto";
 
 @Controller("api/v1/ride")
 export class RideController{
@@ -30,8 +32,8 @@ export class RideController{
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(UserRoles.RIDER)
     @Post(':id/pay')
-    async payRide(@Param('id') id: number){
-        return await this.rideService.payRide(id);
+    async payRide(@Body() payRideDto: PayRideDto,@Param('id') id: number){
+        return await this.rideService.payRide(id, payRideDto.paymentSourceId);
     }
 
     @Get()

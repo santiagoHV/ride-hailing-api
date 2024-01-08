@@ -4,21 +4,21 @@ import { Payment } from "./entities/payment.entity";
 import { PaymentSource } from "./entities/paymentSource.entity";
 import { PaymentService } from "./services/payment.services";
 import { PaymentController } from "./payment.controller";
-import { WompiService } from "src/services/wompi/wompi.service";
+import { WompiApiModule } from "../external-services/wompiApi/wompiApi.module";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
             Payment,
             PaymentSource
-        ])
+        ]),
+        WompiApiModule
     ],
     controllers: [
         PaymentController
     ],
     providers: [
         PaymentService,
-        WompiService
     ],
     exports: [
         PaymentService

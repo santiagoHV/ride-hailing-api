@@ -2,7 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Payment, PaymentStatus } from "../entities/payment.entity";
 import { Repository } from "typeorm";
-import { WompiService } from "src/services/wompi/wompi.service";
+import { WompiApiService } from "src/modules/external-services/wompiApi/wompiApi.service";
+import { PaymentSource } from "../entities/paymentSource.entity";
 
 //TODO: migrate to admin module
 const AMOUNT_PER_KM = 1000;
@@ -15,7 +16,8 @@ const currency = "COP";
 export class PaymentService{
     constructor(
         @InjectRepository(Payment) private readonly paymentRepository: Repository<Payment>,
-        private readonly wompiService: WompiService
+        @InjectRepository(PaymentSource) private readonly paymenSourceRepository: Repository<PaymentSource>,
+        private readonly wompiApiService: WompiApiService
     ){}
 
     async createPayment(distance: number, time: number){
@@ -29,16 +31,24 @@ export class PaymentService{
             status: PaymentStatus.PENDING
         })
 
-        console.log(payment)
-
-        console.log('error en guardado')
         return await this.paymentRepository.save(payment)
     }
 
-    async createTransaction(payment: Payment){
+    async createTransaction(payment: Payment, paymentSource: PaymentSource){
+        payment.paymentSource = paymentSource
+        const transaction = await this.wompiApiService.createTransaction(payment)
+
+        console.log(transaction)
         payment.status = PaymentStatus.APPROVED
         payment.cancellationDate = new Date()
         return await this.paymentRepository.save(payment)
+    }
+
+    async findPaymentSourceById(payment_source_id: number): Promise<PaymentSource> {
+        return await this.paymenSourceRepository.findOne({
+            where: { id: payment_source_id },
+            relations: ['user']
+        })
     }
 
     async getPaymentById(id: number){

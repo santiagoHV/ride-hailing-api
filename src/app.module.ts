@@ -8,7 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 import { RidesModule } from './modules/rides/rides.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PaymentModule } from './modules/payment-sources/payment.module';
-import { WompiService } from './services/wompi/wompi.service';
+import { WompiApiModule } from './modules/external-services/wompiApi/wompiApi.module';
 
 @Module({
   imports: [
@@ -19,18 +19,17 @@ import { WompiService } from './services/wompi/wompi.service';
       },
     }),
     ConfigModule.forRoot({
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
-      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`
     }),
     UsersModule,
     RidesModule,
     AuthModule,
-    PaymentModule
+    PaymentModule,
+    WompiApiModule
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    WompiService
   ],
 })
 export class AppModule implements OnModuleInit {

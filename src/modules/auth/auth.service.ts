@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../users/user.service';
 import { SingupDto } from './dtos/signup.dto';
@@ -35,12 +35,12 @@ export class AuthService {
   async login(email: string, password: string): Promise<string> {
     const user = await this.userService.findByEmail(email);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const validPassword = await this.userService.comparePasswords(password, user.password);
     if (!validPassword) {
-      throw new Error('Invalid password');
+      throw new ForbiddenException('Invalid password');
     }
 
     return this.createToken(user.id, user.email, user.role);

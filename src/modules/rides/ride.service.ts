@@ -83,10 +83,10 @@ export class RideService{
         }
     }
 
-    async payRide(id: number){
+    async payRide(id: number, payment_source_id: number){
         const ride = await this.rideRepository.findOne({
             where: { id },
-            relations: ['payment']
+            relations: ['payment', 'rider']
         })
 
         if(!ride){
@@ -100,8 +100,16 @@ export class RideService{
         if(ride.payment.status === PaymentStatus.APPROVED){
             throw new BadRequestException("Ride already paid")
         }
+
+        const paymentSource = await this.paymentService.findPaymentSourceById(payment_source_id)
+
+        if(!paymentSource){
+            throw new NotFoundException("Payment source not found")
+        }else if(paymentSource.user.id !== ride.rider.id){
+            throw new BadRequestException("Payment source forbidden")
+        }
         
-        await this.paymentService.createTransaction(ride.payment)
+        await this.paymentService.createTransaction(ride.payment, paymentSource)
         await this.rideRepository.save(ride)
 
         return {
