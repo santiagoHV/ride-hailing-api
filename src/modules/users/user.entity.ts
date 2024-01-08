@@ -24,6 +24,12 @@ export class User {
     @Column()
     password: string
 
+    @Column({nullable: true, type: 'double precision'})
+    actualLocationLat: number
+
+    @Column({nullable: true, type: 'double precision'})
+    actualLocationLng: number
+
     @Column({type: 'enum', enum: UserRoles, default: UserRoles.RIDER})
     role: UserRoles
 

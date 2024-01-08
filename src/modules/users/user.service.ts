@@ -23,6 +23,16 @@ export class UserService{
         });
     }
 
+    async findUserPayments(user: User){
+        const completeUser = await this.userRepository.findOne({
+            where: { id: user.id },
+            relations: ['riddenRides', 'riddenRides.payment']
+        })
+        let rides = completeUser.riddenRides
+        const payments = rides.map(ride => ride.payment);
+        return payments;
+    }
+
     async findActiveDrivers(){
         //TODO: create logic to find active drivers
         const drivers = await this.userRepository.find({

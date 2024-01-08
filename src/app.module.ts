@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 import { RidesModule } from './modules/rides/rides.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { PaymentModule } from './modules/payment-sources/payment.module';
+import { WompiService } from './services/wompi/wompi.service';
 
 @Module({
   imports: [
@@ -18,13 +20,18 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+      isGlobal: true,
     }),
     UsersModule,
     RidesModule,
-    AuthModule
+    AuthModule,
+    PaymentModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    WompiService
+  ],
 })
 export class AppModule implements OnModuleInit {
   onModuleInit() {

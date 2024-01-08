@@ -1,55 +1,56 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import e from "express";
-import { Payment } from "../entities/payment.entity";
+import { Payment, PaymentStatus } from "../entities/payment.entity";
 import { Repository } from "typeorm";
+import { WompiService } from "src/services/wompi/wompi.service";
+
+//TODO: migrate to admin module
+const AMOUNT_PER_KM = 1000;
+const AMOUNT_PER_MINUTE = 200;
+const MINIMUM_AMOUNT = 3500;
+const currency = "COP";
+
 
 @Injectable()
 export class PaymentService{
     constructor(
-        @InjectRepository(Payment) private readonly paymentRepository: Repository<Payment>
+        @InjectRepository(Payment) private readonly paymentRepository: Repository<Payment>,
+        private readonly wompiService: WompiService
     ){}
 
-    createPayment(
-        startLat: Number,
-        startLng: Number, 
-        endLat: Number,
-        endLng: Number,
-        startDate: Date, 
-        endDate: Date,
+    async createPayment(distance: number, time: number){
         
-    ){
-        const distance = this.calculateDistance(startLat, startLng, endLat, endLng)
-        const time = this.calculateTimeMinutes(startDate, endDate)
-        const price = this.calculatePrice(distance, time)
+        const amount = this.calculateAmount(distance, time)
 
+        const payment = this.paymentRepository.create({
+            currency,
+            amount,
+            creationDate: new Date(),
+            status: PaymentStatus.PENDING
+        })
+
+        console.log(payment)
+
+        console.log('error en guardado')
+        return await this.paymentRepository.save(payment)
     }
 
-    private calculatePrice(distance, time){
-        const price = (distance * 0.5) + (time * 0.1)
-        return price;
+    async createTransaction(payment: Payment){
+        payment.status = PaymentStatus.APPROVED
+        payment.cancellationDate = new Date()
+        return await this.paymentRepository.save(payment)
     }
 
-    private calculateDistance(startLat, startLng, endLat, endLng){
-        const radius = 6371;
-        const dLat = this.degreesToRadians(endLat - startLat);
-        const dLng = this.degreesToRadians(endLng - startLng);
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
-        Math.cos(this.degreesToRadians(startLat)) * Math.cos(this.degreesToRadians(endLat)) *
-        Math.sin(dLng/2) * Math.sin(dLng/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = radius * c;
-
-        return distance;
+    async getPaymentById(id: number){
+        return await this.paymentRepository.findOne({
+            where: { id }
+        })
     }
 
-    private degreesToRadians(degrees: any): any{
-        const pi = Math.PI;
-        const radians = degrees * (pi/180);
+    private calculateAmount(distance, time){
+        const amount = (distance * AMOUNT_PER_KM) + (time * AMOUNT_PER_MINUTE) + MINIMUM_AMOUNT;
+        return amount;
     }
 
-    private calculateTimeMinutes(startDate, endDate){
-        const time = (endDate - startDate)
-        return time;
-    }
+    
 }
