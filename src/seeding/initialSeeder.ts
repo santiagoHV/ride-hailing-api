@@ -36,8 +36,8 @@ export class MainSeeder implements Seeder{
         await userRepo.save(userRider)
 
         const paymentSource = new PaymentSource()
-        paymentSource.externalId = "123456789"
-        paymentSource.lastFour = 1234
+        paymentSource.externalId = "96926"
+        paymentSource.lastFour = 4242
         paymentSource.brand = "Visa"
         paymentSource.user = userRider
 
